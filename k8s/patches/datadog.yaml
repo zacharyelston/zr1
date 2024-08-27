@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment
+  labels:
+    tags.datadoghq.com/system_tag: "scsre-hc"
+    tags.datadoghq.com/service: "scsre-hc"
+  annotations:
+    ad.datadoghq.com/tags: |
+      {
+        "system_tag":    "scsre-hc",
+        "team":          "SC-SRE",
+        "on_call_group": "sc",
+        "sub_dept":      "sre"
+      }
+spec:
+  selector:
+    matchLabels:
+      app: scsre-hc
+  template:
+    metadata:
+      labels:
+        tags.datadoghq.com/system_tag: "scsre-hc"
+        tags.datadoghq.com/service: "scsre-hc"
+        tags.datadoghq.com/version: "2024-07-17.5"
+      annotations:
+        ad.datadoghq.com/tags: |
+          {
+            "system_tag":    "scsre-hc",
+            "team":          "OTS - Supply Chain Global SRE",
+            "on_call_group": "abf10795-878c-4b9e-9b82-e1584819ca16",
+            "sub_dept":      "SC-SRE"
+          }
+        ad.datadoghq.com/health-check-container.logs: >-
+          [{
+            "service": "scsre-hc"
+            "source": "JSON"
+          }]            
+    spec:
+      containers:
+        - name: health-check-container
+          env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_SERVICE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/service']
+            - name: DD_VERSION
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/version']

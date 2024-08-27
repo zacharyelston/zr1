@@ -1,0 +1,23 @@
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+
+#namePrefix: scsre-
+#namespace: sc-commons
+# commonLabels:
+#   app.kubernetes.io/name: scsre-hc
+images:
+- name: application-image-placeholder:latest
+  newName: cfa-docker.jfrog.io/scsre-hc
+  newTag: f455e29
+- name: cfa-docker.jfrog.io/scsre-hc
+  newTag: 2024-08-27.1
+
+resources:
+- resources/properties.yaml
+- resources/deployment.yaml
+# - resources/irsa.yaml
+patches:
+- path: patches/datadog.yaml
+
+commonAnnotations:
+  tags.datadoghq.com/version: 2024-08-27.1

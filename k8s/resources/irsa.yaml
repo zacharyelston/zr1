@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  # annotations:
+  #   eks.amazonaws.com/role-arn: ... # This annotation will be injected by kubecross webhook.
+  name: irsa # Must match 'kind: IAMRole' below.
+---
+apiVersion: kubecross.chick-fil-a.com/v1alpha1
+kind: IAMRole
+metadata:
+  name: irsa # Must match 'kind: ServiceAccount' above.
+spec:
+  # Copied from arn:aws:iam::263364065385:role/dev-scdh-spine-roles-og-api-k8s-role
+  inlinePolicy: |
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Action": [
+                    "logs:*"
+                ],
+                "Resource": "*",
+                "Effect": "Allow"
+            },
+            {
+                "Action": [
+                    "cloudwatch:*"
+                ],
+                "Resource": "*",
+                "Effect": "Allow"
+            },
+            {
+                "Action": [
+                    "sts:*"
+                ],
+                "Resource": "*",
+                "Effect": "Allow"
+            },
+            {
+                "Effect": "Allow",
+                "Action": [
+                    "secretsmanager:GetResourcePolicy",
+                    "secretsmanager:GetSecretValue",
+                    "secretsmanager:DescribeSecret",
+                    "secretsmanager:ListSecretVersionIds"
+                ],
+                "Resource": [
+                    "arn:aws:secretsmanager:us-east-1:378152002089:secret:*"
+                ]
+            },
+            {
+                "Effect": "Allow",
+                "Action": "rds-db:connect",
+                "Resource": "arn:aws:rds-db:*:378152002089:dbuser:*/*"
+            }
+        ]
+    }
