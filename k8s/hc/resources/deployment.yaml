@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scsre-hc
+  template:
+    metadata:
+      labels:
+        app: scsre-hc
+        app.kubernetes.io/name: scsre-hc
+    spec:
+      imagePullSecrets:
+        - name: artifactory-docker
+      initContainers: []
+      serviceAccountName: irsa
+      terminationGracePeriodSeconds: 120
+      containers:
+        - name: health-check-container
+          image: application-image-placeholder:latest
+          imagePullPolicy: Always
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 3000
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ "ALL", "CAP_NET_RAW" ] # kyverno: autogen-require-drop-all, autogen-require-drop-cap-net-raw
+          resources:
+            requests:
+              cpu: 225m
+              memory: 128Mi
+            limits:
+              cpu: 1500m
+              memory: 1024Mi
+          env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_SERVICE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/service']
+            - name: DD_VERSION
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/version']
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp-mount
+      volumes:
+        - name: tmp-mount
+          emptyDir:
+            sizeLimit: 100Mi
