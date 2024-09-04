@@ -38,6 +38,15 @@ def hello():
     REQUEST_LATENCY.labels('GET', '/').observe(time.time() - start_time) 
     return response
 
+@app.route('/cheese')
+def cheese():
+    start_time = time.time()
+    REQUEST_COUNT.labels('GET', '/cheese', 200).inc()
+
+    response = jsonify(message='nacho?!')
+    REQUEST_LATENCY.labels('GET', '/cheese').observe(time.time() - start_time) 
+    return response
+
 @app.route('/redpanda')
 def redpanda():
     url = environ.get('RPURL')
@@ -50,7 +59,11 @@ def redpanda():
 def google():
     url = 'https://www.google.com'
     rpdata = requests.get(url) 
+    start_time = time.time()
+    REQUEST_COUNT.labels('GET', '/google', 200).inc()
+    REQUEST_LATENCY.labels('GET', '/google').observe(time.time() - start_time)
     return rpdata.content
+    
 
 if __name__ == '__main__':
             app.run(host='0.0.0.0', port=5000)
