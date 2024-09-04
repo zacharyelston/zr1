@@ -3,12 +3,10 @@ version: "3"
 services:
   health-check:
     build: 
-      context: .
-      target: dev
+      context: ./app
     command:
       - python
       - app.py
     ports:
       - "5000:80"
 
-volumes:
