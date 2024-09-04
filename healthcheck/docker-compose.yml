@@ -4,11 +4,9 @@ services:
   health-check:
     build: 
       context: .
-
     command:
       - python
       - app.py
     ports:
       - "5000:80"
 
-volumes:
