@@ -1,0 +1,47 @@
+---
+execution_type: server
+context: release-poc-sandbox
+domain: release.scsandbox.cfadevelop.com
+repo_name: zacharyelston/zr1
+hostnames:
+- health-check: health-check-zr1-hc-${env_id}.${domain}
+environment_templates:
+- name: ephemeral
+- name: permanent
+resources:
+  cpu:
+    requests: 100m
+  memory:
+    limits: 1Gi
+    requests: 100Mi
+  replicas: 1
+services:
+- name: health-check
+  image: zacharyelston/zr1/health-check
+  build:
+    context: healthcheck/app
+  has_repo: true
+  args:
+  - python
+  - app.py
+  ports:
+  - type: node_port
+    target_port: '5000'
+    port: '5000'
+    loadbalancer: false
+workflows:
+- name: setup
+  parallelize:
+  - step: services-0
+    tasks:
+    - services.health-check
+- name: patch
+  parallelize:
+  - step: services-0
+    tasks:
+    - services.health-check
+- name: teardown
+  parallelize:
+  - step: remove-environment
+    tasks:
+    - release.remove_environment
