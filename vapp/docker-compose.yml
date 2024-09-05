@@ -2,7 +2,7 @@ version: "3"
 
 services:
   vote:
-    build: ./vapp/vote
+    build: ./vote
     command:
       - python
       - app.py
@@ -14,7 +14,7 @@ services:
 
   result:
     build:
-      context: ./vapp/result
+      context: ./result
       target: dev
     command:
       - nodemon
@@ -27,7 +27,7 @@ services:
 
   worker:
     build:
-      context: ./vapp/worker
+      context: ./worker
     depends_on:
       - "redis"
       - "db"
