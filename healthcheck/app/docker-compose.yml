@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  health-check:
+    build: ./app
+    command:
+      - python
+      - app.py
+    ports:
+      - "5000:80"
+
