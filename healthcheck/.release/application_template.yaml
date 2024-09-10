@@ -10,7 +10,7 @@ environment_templates:
 - name: permanent
 resources:
   cpu:
-    requests: 101m
+    requests: 102m
   memory:
     limits: 1Gi
     requests: 100Mi
