@@ -1,1 +1,4 @@
+---
+application_template: healthcheck/.release/application_template.yaml
+environment_variables: healthcheck/.release/environment_variables.yaml
 compose: healthcheck/docker-compose.yml
